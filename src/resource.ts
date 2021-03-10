@@ -10,6 +10,7 @@ import createValidationError from './utils/create-validation-error'
 
 const SEQUELIZE_VALIDATION_ERROR = 'SequelizeValidationError'
 const SEQUELIZE_UNIQUE_ERROR = 'SequelizeUniqueConstraintError'
+const SEQUELIZE_DATABASE_ERROR = 'SequelizeDatabaseError'
 
 // this fixes problem with unbound this when you setup type of Mode as a member of another
 // class: https://stackoverflow.com/questions/55166230/sequelize-typescript-typeof-model
@@ -158,6 +159,9 @@ class Resource extends BaseResource {
       const record = await this.SequelizeModel.create(unflattedParams)
       return record.toJSON()
     } catch (error) {
+      if (error.name === SEQUELIZE_DATABASE_ERROR) {
+        throw createValidationError(error)
+      }
       if (error.name === SEQUELIZE_VALIDATION_ERROR) {
         throw createValidationError(error)
       }
@@ -182,6 +186,9 @@ class Resource extends BaseResource {
       const record = await this.findById(id)
       return record.toJSON()
     } catch (error) {
+      if (error.name === SEQUELIZE_DATABASE_ERROR) {
+        throw createValidationError(error)
+      }
       if (error.name === SEQUELIZE_VALIDATION_ERROR) {
         throw createValidationError(error)
       }
